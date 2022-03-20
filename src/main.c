@@ -1,0 +1,66 @@
+#include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include "nvs.h"
+#include "nvs_flash.h"
+#include "esp_spiffs.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "wifi_setup.h"
+#include "czt_mqtt.h"
+#include "parameters.h"
+#include "czt_config.h"
+
+char * TAG = "MAIN";
+
+static esp_err_t init_spiffs(void) {
+    ESP_LOGI(TAG, "Initializing SPIFFS");
+
+    esp_vfs_spiffs_conf_t conf = {
+      .base_path = "/spiffs",
+      .partition_label = NULL,
+      .max_files = 20,   // This decides the maximum number of files that can be created on the storage
+      .format_if_mount_failed = false
+    };
+
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE(TAG, "Mount/Format failed");
+        } else {
+            ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+        }
+        return ESP_FAIL;
+    }
+    else {
+        size_t spiffs_total = 0, spiffs_used = 0;
+        esp_spiffs_info(NULL, &spiffs_total, &spiffs_used);
+        ESP_LOGI(TAG, "SPIFFS space used %dB/%dB.", spiffs_used, spiffs_total);
+    }
+    return ESP_OK;
+}
+
+void app_main(void)
+{
+    ESP_ERROR_CHECK(init_spiffs());
+    
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK( ret );
+
+    // Load parameters
+    loadPersistentSettings(CZT_CONF_FILEPATH);
+
+    ESP_LOGI(TAG, "TEST %d", global_params.random_number);
+
+    wifi_task(global_params.wifi_ssid, global_params.wifi_pass);
+
+    
+    mqtt_app_start();
+
+}

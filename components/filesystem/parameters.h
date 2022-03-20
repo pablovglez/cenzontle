@@ -1,0 +1,62 @@
+#ifndef __G_PARAMS_H__
+#define __G_PARAMS_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+#define UUID_SZ         37
+#define CONF_LINE_SIZE  64
+#define MAX_ADV_NAME    20
+
+typedef enum {
+    WF_SSID,
+    WF_PASS,
+    MQTT_URI,
+    BT_NAME,
+    BLE_UUID,
+    RDM_NUM,
+    PARAM_END
+} CztParamEnum;
+
+typedef struct Settings {
+  char wifi_ssid[UUID_SZ];
+  char wifi_pass[UUID_SZ];
+  char mqtt_uri[CONF_LINE_SIZE/2];
+  char bt_name[MAX_ADV_NAME];
+  char ble_uiid[UUID_SZ];
+  bool random_number //just a number to remember how to parse numbers
+} CztPersistentSettings;
+
+extern CztPersistentSettings global_params;
+
+/**
+ * @brief Read persistent parameters from a file
+ * 
+ * @return Number of parameters successfully read
+ */
+int loadPersistentSettings(const char* filename);
+
+/**
+ * @brief Write persistent parameters to a file
+ * 
+ * @return Number of parameters successfully written
+ */
+int pushPersistentSettings(const char* filename);
+
+/**
+ * @brief Read the settings file, and print each line to the console
+ * 
+ * @return Number of parameters successfully read
+ */
+int printPersistentSettingsFile(const char* filename);
+
+/**
+ * @brief Reset the default configuration (to the default_params variable value) and write it to the file
+ * 
+ * @return Number of parameters successfully written
+ */
+int resetPersistentSettings(const char* filename);
+
+#endif
