@@ -74,8 +74,8 @@ void wifi_task(char* wifi_ssid, char * wifi_pass)
         };
 
     if(wifi_ssid != NULL || wifi_pass != NULL){
-        strcpy(wifi_config.sta.ssid,wifi_ssid);
-        strcpy(wifi_config.sta.ssid,wifi_pass);
+        memcpy(wifi_config.sta.ssid, wifi_ssid, strlen(wifi_ssid));
+        memcpy(wifi_config.sta.password, wifi_pass, strlen(wifi_pass));
     }
     
     ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
@@ -83,6 +83,9 @@ void wifi_task(char* wifi_ssid, char * wifi_pass)
     ESP_ERROR_CHECK( esp_wifi_start() );
 
     ESP_LOGI(TAG, "wifi_init_sta finished.");
+
+    ESP_LOGI(TAG, "SSID %s", wifi_config.sta.ssid);
+    ESP_LOGI(TAG, "PASS %s", wifi_config.sta.password);
 
     EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group,
             WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
@@ -94,10 +97,10 @@ void wifi_task(char* wifi_ssid, char * wifi_pass)
      * happened. */
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(TAG, "connected to AP %s",
-                 WIFI_SSID);
+                 wifi_config.sta.ssid);
     } else if (bits & WIFI_FAIL_BIT) {
         ESP_LOGI(TAG, "Failed to connect to to AP %s",
-                 WIFI_SSID);
+                 wifi_config.sta.ssid);
     } else {
         ESP_LOGE(TAG, "UNEXPECTED EVENT");
     }

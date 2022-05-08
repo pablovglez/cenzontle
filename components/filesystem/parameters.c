@@ -3,7 +3,6 @@
 
 #include "parameters.h"
 
-static const char *TAG = "CX_CONF";
 const char *g_params_names[] = {
     "wifi_ssid",
     "wifi_pass",
@@ -11,10 +10,16 @@ const char *g_params_names[] = {
     "BLE_minor",
     "bt_name",
     "ble_uiid",
+    "lcd_num_rows",
+    "lcd_num_rows",
+    "lcd_visible_columns",
+    "lcd_sda",
+    "lcd_scl",
+    "lcd_max_msg",
     "random_number"
     };
 
-CztPersistentSettings global_params = {"fake_ap", "dummy", "mqtt://fake_mqtt.com:1883", "Cenzontle_BLE", "ffeeddcc-bbaa-9988-7766-554433221100",0};
+CztPersistentSettings global_params = {"fake_ap", "dummy", "mqtt://fake_mqtt.com:1883", "Cenzontle_BLE", "ffeeddcc-bbaa-9988-7766-554433221100", 2, 32, 16, 18, 19, 5, 0};
 
 int loadPersistentSettings(const char* filename) {
     CztParamEnum next = WF_SSID;
@@ -43,8 +48,31 @@ int loadPersistentSettings(const char* filename) {
             break;
         case BLE_UUID:
             strcpy(global_params.ble_uiid, val);
-            next = RDM_NUM;
+            next = LCD_ROWS;
             break;
+        case LCD_ROWS:
+            global_params.lcd_rows = atoi(val);
+            next = LCD_COLS;
+        case LCD_COLS:
+            //"lcd_num_rows",
+            global_params.lcd_cols = atoi(val);
+            next = LCD_VIS_COLS;
+        case LCD_VIS_COLS:
+            //"lcd_visible_columns"
+            global_params.lcd_visible_columns = atoi(val);
+            next = LCD_SDA;
+        case LCD_SDA:
+            //"i2c_sda",
+            global_params.lcd_sda = atoi(val);
+            next = LCD_SCL;
+        case LCD_SCL:
+            //"i2c_scl",
+            global_params.lcd_scl = atoi(val);
+            next = LCD_MAX_MSG;
+        case LCD_MAX_MSG:
+            //"lcd_max_msg",
+            global_params.lcd_max_msg = atoi(val);
+            next = RDM_NUM;
         case RDM_NUM:
             global_params.random_number = atoi(val);
             next = PARAM_END;

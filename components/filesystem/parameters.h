@@ -16,17 +16,29 @@ typedef enum {
     MQTT_URI,
     BT_NAME,
     BLE_UUID,
+    LCD_ROWS,
+    LCD_COLS,
+    LCD_VIS_COLS,
+    LCD_SDA,
+    LCD_SCL,
+    LCD_MAX_MSG,
     RDM_NUM,
     PARAM_END
 } CztParamEnum;
 
 typedef struct Settings {
-  char wifi_ssid[UUID_SZ];
-  char wifi_pass[UUID_SZ];
+  char wifi_ssid[CONF_LINE_SIZE/2];
+  char wifi_pass[CONF_LINE_SIZE];
   char mqtt_uri[CONF_LINE_SIZE/2];
   char bt_name[MAX_ADV_NAME];
   char ble_uiid[UUID_SZ];
-  bool random_number //just a number to remember how to parse numbers
+  int lcd_rows;
+  int lcd_cols;
+  int lcd_visible_columns;
+  int lcd_sda;
+  int lcd_scl;
+  int lcd_max_msg;
+  bool random_number; //just a number to remember how to parse numbers
 } CztPersistentSettings;
 
 extern CztPersistentSettings global_params;

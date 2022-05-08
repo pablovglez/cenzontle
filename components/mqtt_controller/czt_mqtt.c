@@ -47,8 +47,10 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         break;
     case MQTT_EVENT_DATA:
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-        printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-        printf("DATA=%.*s\r\n", event->data_len, event->data);
+        char * topic = malloc(event->topic_len);
+        char * data = malloc(event->data_len);
+        ESP_LOGI(TAG,"TOPIC=%.*s", event->topic_len, event->topic);
+        ESP_LOGI(TAG,"DATA=%.*s", event->data_len, event->data);
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -71,10 +73,11 @@ void mqtt_app_start(char * mqtt_uri)
     esp_mqtt_client_config_t mqtt_cfg = {
         .uri = "mqtt://192.168.4.1:1883",
     };
-    if (mqtt_uri != NULL)
+    /*if (mqtt_uri != NULL)
     {
-        strcpy(mqtt_cfg.uri, mqtt_uri);
-    }
+        //strcpy(mqtt_cfg.uri, mqtt_uri);
+        mqtt_cfg.uri = mqtt_uri;
+    }*/
 
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
