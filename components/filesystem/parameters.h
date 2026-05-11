@@ -1,5 +1,5 @@
-#ifndef __G_PARAMS_H__
-#define __G_PARAMS_H__
+#ifndef __PARAMETERS_H__
+#define __PARAMETERS_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,37 +11,33 @@
 #define MAX_ADV_NAME    20
 
 typedef enum {
-    WF_SSID,
-    WF_PASS,
-    MQTT_URI,
-    BT_NAME,
-    BLE_UUID,
-    LCD_ROWS,
-    LCD_COLS,
-    LCD_VIS_COLS,
-    LCD_SDA,
-    LCD_SCL,
-    LCD_MAX_MSG,
-    RDM_NUM,
+    PROJECT_NAME,
+    DS18B20_GPIO_PIN,
+    POLL_INTERVAL_MS,
+    NEO6M_GPIO_TX_PIN,
+    NEO6M_GPIO_RX_PIN,
+    NEO6M_UART_PORT_NUM,
+    WIFI_SSID,
+    WIFI_PASS,
+    MQTT_BROKER_URL,
+    MQTT_BASE_TOPIC,
     PARAM_END
-} CztParamEnum;
+} IxtliParamEnum;
 
 typedef struct Settings {
-  char wifi_ssid[CONF_LINE_SIZE/2];
-  char wifi_pass[CONF_LINE_SIZE];
-  char mqtt_uri[CONF_LINE_SIZE/2];
-  char bt_name[MAX_ADV_NAME];
-  char ble_uiid[UUID_SZ];
-  int lcd_rows;
-  int lcd_cols;
-  int lcd_visible_columns;
-  int lcd_sda;
-  int lcd_scl;
-  int lcd_max_msg;
-  bool random_number; //just a number to remember how to parse numbers
-} CztPersistentSettings;
+  char project_name[MAX_ADV_NAME];
+  int ds18b20_gpio_pin;
+  int poll_interval_ms;
+  int neo6m_gpio_tx_pin;
+  int neo6m_gpio_rx_pin;
+  int neo6m_uart_port_num;
+  char wifi_ssid[MAX_ADV_NAME];
+  char wifi_pass[MAX_ADV_NAME];
+  char mqtt_broker_url[CONF_LINE_SIZE];
+  char mqtt_base_topic[MAX_ADV_NAME];
+} PersistentSettings;
 
-extern CztPersistentSettings global_params;
+extern PersistentSettings global_params;
 
 /**
  * @brief Read persistent parameters from a file

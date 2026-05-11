@@ -3,78 +3,76 @@
 
 #include "parameters.h"
 
+static const char *TAG = "CONFIG_MGR";
 const char *g_params_names[] = {
+    "project_name",
+    "ds18b20_gpio_pin",
+    "poll_interval_ms",
+    "neo6m_gpio_tx_pin",
+    "neo6m_gpio_rx_pin",
+    "neo6m_uart_port_num",
     "wifi_ssid",
     "wifi_pass",
-    "mqtt_uri",
-    "BLE_minor",
-    "bt_name",
-    "ble_uiid",
-    "lcd_num_rows",
-    "lcd_num_rows",
-    "lcd_visible_columns",
-    "lcd_sda",
-    "lcd_scl",
-    "lcd_max_msg",
-    "random_number"
+    "mqtt_broker_url",
+    "mqtt_base_topic",
     };
 
-CztPersistentSettings global_params = {"fake_ap", "dummy", "mqtt://fake_mqtt.com:1883", "Cenzontle_BLE", "ffeeddcc-bbaa-9988-7766-554433221100", 2, 32, 16, 18, 19, 5, 0};
+PersistentSettings global_params = {"ESP32", 4, 60000, 17, 16, 1, "demo", "******", "mqtt://localhost", "esp32"};
+
+int dloadPersistentSettings(const char* filename) {
+
+    return 0;
+}
 
 int loadPersistentSettings(const char* filename) {
-    CztParamEnum next = WF_SSID;
+    IxtliParamEnum next = PROJECT_NAME;
     char line[CONF_LINE_SIZE];
 
     FILE *conf_file = fopen(filename, "r");
     while (fgets(line, CONF_LINE_SIZE, conf_file)) {
         line[strcspn(line, "\n")] = 0;
+        // Skip empty lines and comment lines
+        if (line[0] == '\0' || line[0] == ';' || line[0] == '#') continue;
         const char* val = strrchr(line, '=') + 1; // +1 to remove the '=' char
         switch (next) {
-        case WF_SSID:
+        case PROJECT_NAME:
+            strcpy(global_params.project_name, val);
+            next = DS18B20_GPIO_PIN;
+            break;
+        case DS18B20_GPIO_PIN:
+            global_params.ds18b20_gpio_pin = atoi(val);
+            next = POLL_INTERVAL_MS;
+            break;
+        case POLL_INTERVAL_MS:
+            global_params.poll_interval_ms = atoi(val);
+            next = NEO6M_GPIO_TX_PIN;
+            break;
+        case NEO6M_GPIO_TX_PIN:
+            global_params.neo6m_gpio_tx_pin = atoi(val);
+            next = NEO6M_GPIO_RX_PIN;
+            break;
+        case NEO6M_GPIO_RX_PIN:
+            global_params.neo6m_gpio_rx_pin = atoi(val);
+            next = NEO6M_UART_PORT_NUM;
+            break;
+        case NEO6M_UART_PORT_NUM:
+            global_params.neo6m_uart_port_num = atoi(val);
+            next = WIFI_SSID;
+            break;
+        case WIFI_SSID:
             strcpy(global_params.wifi_ssid, val);
-            next = WF_PASS;
+            next = WIFI_PASS;
             break;
-        case WF_PASS:
+        case WIFI_PASS:
             strcpy(global_params.wifi_pass, val);
-            next = MQTT_URI;
+            next = MQTT_BROKER_URL;
             break;
-        case MQTT_URI:
-            strcpy(global_params.mqtt_uri, val);
-            next = BT_NAME;
+        case MQTT_BROKER_URL:
+            strcpy(global_params.mqtt_broker_url, val);
+            next = MQTT_BASE_TOPIC;
             break;
-        case BT_NAME:
-            strcpy(global_params.bt_name, val);
-            next = BLE_UUID;
-            break;
-        case BLE_UUID:
-            strcpy(global_params.ble_uiid, val);
-            next = LCD_ROWS;
-            break;
-        case LCD_ROWS:
-            global_params.lcd_rows = atoi(val);
-            next = LCD_COLS;
-        case LCD_COLS:
-            //"lcd_num_rows",
-            global_params.lcd_cols = atoi(val);
-            next = LCD_VIS_COLS;
-        case LCD_VIS_COLS:
-            //"lcd_visible_columns"
-            global_params.lcd_visible_columns = atoi(val);
-            next = LCD_SDA;
-        case LCD_SDA:
-            //"i2c_sda",
-            global_params.lcd_sda = atoi(val);
-            next = LCD_SCL;
-        case LCD_SCL:
-            //"i2c_scl",
-            global_params.lcd_scl = atoi(val);
-            next = LCD_MAX_MSG;
-        case LCD_MAX_MSG:
-            //"lcd_max_msg",
-            global_params.lcd_max_msg = atoi(val);
-            next = RDM_NUM;
-        case RDM_NUM:
-            global_params.random_number = atoi(val);
+        case MQTT_BASE_TOPIC:
+            strcpy(global_params.mqtt_base_topic, val);
             next = PARAM_END;
             break;
         case PARAM_END:
@@ -90,7 +88,7 @@ free_file:
 }
 
 int pushPersistentSettings(const char* filename) {
-    CztParamEnum next = WF_SSID;
+    IxtliParamEnum next = PROJECT_NAME;
     FILE *conf_file = fopen(filename, "w");
     if (!conf_file)
         return ESP_FAIL;
@@ -98,28 +96,44 @@ int pushPersistentSettings(const char* filename) {
 
     while (next != PARAM_END) {
         switch (next) {
-        case WF_SSID:
+        case PROJECT_NAME:
+            fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.project_name);
+            next = DS18B20_GPIO_PIN;
+            break;
+        case DS18B20_GPIO_PIN:
+            fprintf(conf_file, "%s=%d\n", g_params_names[next], global_params.ds18b20_gpio_pin);
+            next = POLL_INTERVAL_MS;
+            break;
+        case POLL_INTERVAL_MS:
+            fprintf(conf_file, "%s=%d\n", g_params_names[next], global_params.poll_interval_ms);
+            next = NEO6M_GPIO_TX_PIN;
+            break;
+        case NEO6M_GPIO_TX_PIN:
+            fprintf(conf_file, "%s=%d\n", g_params_names[next], global_params.neo6m_gpio_tx_pin);
+            next = NEO6M_GPIO_RX_PIN;
+            break;
+        case NEO6M_GPIO_RX_PIN:
+            fprintf(conf_file, "%s=%d\n", g_params_names[next], global_params.neo6m_gpio_rx_pin);
+            next = NEO6M_UART_PORT_NUM;
+            break;
+        case NEO6M_UART_PORT_NUM:
+            fprintf(conf_file, "%s=%d\n", g_params_names[next], global_params.neo6m_uart_port_num);
+            next = WIFI_SSID;
+            break;
+        case WIFI_SSID:
             fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.wifi_ssid);
-            next = WF_PASS;
+            next = WIFI_PASS;
             break;
-        case WF_PASS:
+        case WIFI_PASS:
             fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.wifi_pass);
-            next = MQTT_URI;
+            next = MQTT_BROKER_URL;
             break;
-        case MQTT_URI:
-            fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.mqtt_uri);
-            next = BT_NAME;
+        case MQTT_BROKER_URL:
+            fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.mqtt_broker_url);
+            next = MQTT_BASE_TOPIC;
             break;
-        case BT_NAME:
-            fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.bt_name);
-            next = BLE_UUID;
-            break;
-        case BLE_UUID:
-            fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.ble_uiid);
-            next = RDM_NUM;
-            break;
-        case RDM_NUM:
-            fprintf(conf_file, "%s=%d\n", g_params_names[next], global_params.random_number);
+        case MQTT_BASE_TOPIC:
+            fprintf(conf_file, "%s=%s\n", g_params_names[next], global_params.mqtt_base_topic);
             next = PARAM_END;
             break;
         case PARAM_END:
