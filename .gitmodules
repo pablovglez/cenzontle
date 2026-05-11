@@ -1,0 +1,4 @@
+[submodule "components/ble_component"]
+	path = components/ble_component
+	url = git@github.com:pablovglez/esp_ble_controller.git
+	branch = develop
