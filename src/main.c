@@ -8,12 +8,18 @@
 
 #include "config_file.h"
 #include "parameters.h"
+#if !defined(BLE_MODE_BEACON) && !defined(BLE_MODE_PERIPHERAL)
 #include "connect_wifi.h"
+#endif
 
 #ifdef BLE_ENABLED
 #include "esp_bt.h"
 #include "esp_ble_controller.h"
 #include "esp_bt_main.h"
+#endif
+
+#ifdef RELAY_MODE
+#include "relay_controller.h"
 #endif
 
 #include <stdbool.h>
@@ -48,8 +54,8 @@ static esp_err_t init_spiffs(void){
     return ESP_OK;
 }
 
-
 void app_main(){
+    show_version();
     ESP_ERROR_CHECK(init_spiffs());
 
     // Initialize NVS
@@ -59,29 +65,30 @@ void app_main(){
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
-
     
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     
     // Load parameters
     loadPersistentSettings(CONF_FILEPATH);
     
-
     // If BLE_MODE != 0 We initialze WiFi
-    #ifndef BLE_MODE_BEACON
+    #if !defined(BLE_MODE_BEACON) && !defined(BLE_MODE_PERIPHERAL)
 
     connect_wifi(global_params.project_name, global_params.wifi_ssid, global_params.wifi_pass);
-    /*char ip_address[16] = {0};
+    char ip_address[16] = {0};
     get_ip_address(ip_address, 16);
     
-    */
+    #endif
+    
+    #ifdef RELAY_MODE
+    relay_init();
     #endif
     
     #ifdef BLE_ENABLED
 
     uint8_t mac[6];
-    get_mac_address(mac);
-    ble_init(mac);
+    get_ble_mac_address(mac);
+    ble_init(mac, global_params.ble_uuid);
 
     #endif
     
