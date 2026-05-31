@@ -9,7 +9,35 @@
 #define UUID_SZ         37
 #define CONF_LINE_SIZE  64
 #define MAX_ADV_NAME    20
+#ifdef BLE_MODE_BEACON
 
+typedef enum {
+    PROJECT_NAME,
+    BLE_UUID,
+    BLE_MAJOR,
+    BLE_MINOR,
+    PARAM_END
+} IxtliParamEnum;
+
+typedef struct Settings {
+  char project_name[MAX_ADV_NAME];
+  uint8_t ble_uuid[16];
+  uint16_t ble_major;
+  uint16_t ble_minor;
+} PersistentSettings;
+#elif defined(BLE_MODE_PERIPHERAL)
+typedef enum {
+    PROJECT_NAME,
+    BLE_UUID,
+    PARAM_END
+} IxtliParamEnum;
+
+typedef struct Settings {
+  char project_name[MAX_ADV_NAME];
+  uint8_t ble_uuid[16];
+} PersistentSettings;
+
+#else
 typedef enum {
     PROJECT_NAME,
     DS18B20_GPIO_PIN,
@@ -21,6 +49,7 @@ typedef enum {
     WIFI_PASS,
     MQTT_BROKER_URL,
     MQTT_BASE_TOPIC,
+    BLE_UUID,
     PARAM_END
 } IxtliParamEnum;
 
@@ -35,7 +64,10 @@ typedef struct Settings {
   char wifi_pass[MAX_ADV_NAME];
   char mqtt_broker_url[CONF_LINE_SIZE];
   char mqtt_base_topic[MAX_ADV_NAME];
+  uint8_t ble_uuid[16];
 } PersistentSettings;
+
+#endif
 
 extern PersistentSettings global_params;
 
