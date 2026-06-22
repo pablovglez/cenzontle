@@ -5,7 +5,7 @@
 #include "freertos/task.h"
 #include "esp_spiffs.h"
 #include "esp_log.h"
-
+#include "version.h"
 #include "config_file.h"
 #include "parameters.h"
 #if !defined(BLE_MODE_BEACON) && !defined(BLE_MODE_PERIPHERAL)
