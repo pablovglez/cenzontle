@@ -4,6 +4,6 @@
 FILE(GLOB_RECURSE app_sources ${CMAKE_SOURCE_DIR}/src/*.*)
 
 idf_component_register(SRCS ${app_sources}
-	REQUIRES filesystem driver esp_partition esp_timer bt relay_component utils
+	REQUIRES filesystem driver esp_partition esp_timer bt relay_component led_component utils
 	PRIV_REQUIRES nvs_flash 
 	)

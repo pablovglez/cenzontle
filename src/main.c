@@ -8,6 +8,8 @@
 #include "version.h"
 #include "config_file.h"
 #include "parameters.h"
+#include "version.h"
+
 #if !defined(BLE_MODE_BEACON) && !defined(BLE_MODE_PERIPHERAL)
 #include "connect_wifi.h"
 #endif
