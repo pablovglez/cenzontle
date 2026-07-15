@@ -9,7 +9,7 @@ typedef struct {
     int occurrences; // Number of times the timer has been triggered
 } led_timer_message_t;
 
-void init_led();
+void init_led(int led_pin);
 void led_on(int led_pin);
 void led_off(int led_pin);
 void stop_led_processing_task();
