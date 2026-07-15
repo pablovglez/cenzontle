@@ -122,9 +122,6 @@ void led_processing_task(void *pvParameters) {
         int idx = 0;
 
         // Handle the LED timer message
-        //xSemaphoreTake(led_task_lock, portMAX_DELAY);
-        // Log all the existing elements in led_task_handles
-        ESP_LOGI(TAG, "led_task_handles: %d", led_task_handles[0]);
         if (led_task_handles[idx] != NULL) {
             xSemaphoreGive(led_task_lock);
             ESP_LOGW(TAG, "LED %d timer task already running, skipping new command", msg.led_pin);
