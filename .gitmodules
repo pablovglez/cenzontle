@@ -2,3 +2,7 @@
 	path = components/ble_component
 	url = git@github.com:pablovglez/esp_ble_controller.git
 	branch = develop
+[submodule "components/relay_component"]
+	path = components/relay_component
+	url = git@github.com:pablovglez/esp_relay_controller
+	branch = develop
