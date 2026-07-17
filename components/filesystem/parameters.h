@@ -9,32 +9,35 @@
 #define UUID_SZ         37
 #define CONF_LINE_SIZE  64
 #define MAX_ADV_NAME    20
+
 #ifdef BLE_MODE_BEACON
 
 typedef enum {
     PROJECT_NAME,
     BLE_UUID,
     BLE_MAJOR,
-    BLE_MINOR,
-    PARAM_END
+    BLE_MINOR
+    PARAM_END,
 } IxtliParamEnum;
 
 typedef struct Settings {
-  char project_name[MAX_ADV_NAME];
-  uint8_t ble_uuid[16];
-  uint16_t ble_major;
-  uint16_t ble_minor;
+    char project_name[MAX_ADV_NAME];
+    uint8_t ble_uuid[16];
+    uint16_t ble_major;
+    uint16_t ble_minor;
 } PersistentSettings;
 #elif defined(BLE_MODE_PERIPHERAL)
 typedef enum {
     PROJECT_NAME,
     BLE_UUID,
+    FORCE_RELAY_UP,
     PARAM_END
 } IxtliParamEnum;
 
 typedef struct Settings {
-  char project_name[MAX_ADV_NAME];
-  uint8_t ble_uuid[16];
+    char project_name[MAX_ADV_NAME];
+    uint8_t ble_uuid[16];
+    uint8_t force_relay_up;
 } PersistentSettings;
 
 #else

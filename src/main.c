@@ -89,6 +89,7 @@ void app_main(){
     uint8_t mac[6];
     get_ble_mac_address(mac);
     ble_init(mac, global_params.ble_uuid);
+    set_force_relay_up(global_params.force_relay_up);
 
     #endif
     

@@ -108,19 +108,11 @@ free_file:
 
 const char *g_params_names[] = {
     "project_name",
-    "ds18b20_gpio_pin",
-    "poll_interval_ms",
-    "neo6m_gpio_tx_pin",
-    "neo6m_gpio_rx_pin",
-    "neo6m_uart_port_num",
-    "wifi_ssid",
-    "wifi_pass",
-    "mqtt_broker_url",
-    "mqtt_base_topic",
-    "ble_uuid"
+    "ble_uuid",
+    "force_relay_up"
     };
 
-PersistentSettings global_params = {"ESP32", {0}};
+PersistentSettings global_params = {"ESP32", {0}, false};
 
 int loadPersistentSettings(const char* filename) {
     IxtliParamEnum next = PROJECT_NAME;
@@ -146,6 +138,11 @@ int loadPersistentSettings(const char* filename) {
                 }
                 sscanf(&val[i * 2], "%2hhx", &global_params.ble_uuid[i]);
             }
+            next = FORCE_RELAY_UP;
+            break;
+        case FORCE_RELAY_UP:
+            ESP_LOGI(TAG, "Parsing force_relay_up: %s", val);
+            global_params.force_relay_up = (strcmp(val, "true") == 0 || strcmp(val, "True") == 0 || strcmp(val, "1") == 0);
             next = PARAM_END;
             break;
         case PARAM_END:
@@ -179,6 +176,10 @@ int pushPersistentSettings(const char* filename) {
                 fprintf(conf_file, "%02X", global_params.ble_uuid[i]);
             }
             fprintf(conf_file, "\n");
+            next = FORCE_RELAY_UP;
+            break;
+        case FORCE_RELAY_UP:
+            fprintf(conf_file, "%s\n", global_params.force_relay_up ? "true" : "false");
             next = PARAM_END;
             break;
         case PARAM_END:
